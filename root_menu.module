@@ -1,9 +1,12 @@
 <?php
 
 /**
- * @file example_entity.module
- * Contains core hooks.
+ * @file
+ * Code for the Root Menu feature.
  */
+
+include_once 'root_menu.features.inc';
+
 
 /**
  * Implements hook_entity_info().
