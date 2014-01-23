@@ -1,0 +1,231 @@
+<?php
+
+/**
+ * @file example_entity.module
+ * Contains core hooks.
+ */
+
+/**
+ * Implements hook_entity_info().
+ */
+function root_menu_entity_info() {
+  $return = array(
+    'root_menu_item' => array(
+      'label' => t('Root Menu Item'),
+      'plural label' => t('Root Menu Items'),
+      // Use the Entity API controller.
+      'controller class' => 'EntityAPIController',
+      'base table' => 'root_menu_item',
+      // Generic callback: one less callback to define.
+      'uri callback' => 'entity_operations_entity_uri',
+      'fieldable' => TRUE,
+      'entity keys' => array(
+        'id' => 'eid',
+        'label' => 'title',
+      ),
+      'bundle keys' => array(
+      ),
+      'bundles' => array(
+        'root_menu_item' => array(
+          'label' => t('Root Menu Item'),
+          'admin' => array(
+            'path' => 'admin/structure/root_menu_item',
+            // TODO: access callback!
+          ),
+        ),
+      ),
+      'inline entity form' => array(
+        'controller' => 'RootMenuItemInlineEntityFormController',
+      ),
+      'view modes' => array(
+        'full' => array(
+          'label' => t('Full content'),
+          'custom settings' => FALSE,
+        ),
+      ),
+      // Entity API properties.
+      'module' => 'root_menu',
+      'entity class' => 'Entity',
+      'access callback' => 'root_menu_entity_access',
+      'admin ui' => array(
+        'path' => 'admin/structure/root_menu_item',
+        // We need our own controller for this, because we're using generic
+        // entity form operations.
+        'controller class' => 'EntityOperationsDefaultAdminUIController',
+      ),
+      // Entity Operations API
+      'operations ui' => array(
+        // The base path for your entities. This is the same as your entity's URI
+        // but without the ID suffix. (In fact, you can set
+        // entity_operations_entity_uri() as your URI callback, which will use the
+        // value here).
+        'path' => 'root_menu_item',
+      ),
+    ),
+  );
+
+  return $return;
+}
+
+/**
+ * Implements hook_entity_operation_info().
+ */
+function root_menu_entity_operation_info() {
+  $info = array(
+    'fieldable_panels_pane' => array(
+      'publish' => array(
+        'handler' => 'EntityOperationsOperationPublish',
+        'provision' => array(
+          'menu' => array(
+          ),
+          'entity view' => TRUE,
+        ),
+      ),
+      'unpublish' => array(
+        'handler' => 'EntityOperationsOperationUnPublish',
+        'provision' => array(
+          'menu' => TRUE,
+          'entity view' => TRUE,
+        ),
+      ),
+    ),
+    'root_menu_item' => array(
+      'add' => array(
+        'handler' => 'EntityOperationsOperationAddGeneric',
+        'provision' => array(
+          'menu' => TRUE,
+        ),
+      ),
+      'view' => array(
+        // Or try EntityOperationsOperationEntityViewOperations!
+        'handler' => 'EntityOperationsOperationEntityView',
+        'provision' => array(
+          'menu' => array(
+            'default' => TRUE,
+          ),
+          'views field' => TRUE,
+        ),
+      ),
+      'edit' => array(
+        'handler' => 'EntityOperationsOperationEditGeneric',
+        'provision' => array(
+          'menu' => TRUE,
+          'views field' => TRUE,
+        ),
+      ),
+      'devel/devel' => array(
+        'handler' => 'EntityOperationsOperationDevel',
+        'provision' => array(
+          'menu' => array(
+            'default secondary' => TRUE,
+          ),
+        ),
+      ),
+      'devel/token' => array(
+        // Note this only shows if you have Entity Token module enabled.
+        'handler' => 'EntityOperationsOperationToken',
+        'provision' => array(
+          'menu' => TRUE,
+        ),
+      ),
+      'devel/metadata' => array(
+        'handler' => 'EntityOperationsOperationMetadata',
+        'provision' => array(
+          'menu' => TRUE,
+        ),
+      ),
+      'publish' => array(
+        'handler' => 'EntityOperationsOperationPublish',
+        'provision' => array(
+          'menu' => array(
+          ),
+          'entity view' => TRUE,
+        ),
+      ),
+      'unpublish' => array(
+        'handler' => 'EntityOperationsOperationUnPublish',
+        'provision' => array(
+          'menu' => TRUE,
+          'entity view' => TRUE,
+        ),
+      ),
+      'author' => array(
+        'handler' => 'EntityOperationsOperationSetOwner',
+        'provision' => array(
+          'menu' => TRUE,
+          //'entity view' => TRUE,
+        ),
+      ),
+    ),
+  );
+  return $info;
+}
+
+/**
+ * Implements callback_entity_access().
+ */
+function root_menu_entity_access($op, $entity, $account, $entity_type) {
+  // TODO: add access control here.
+  return TRUE;
+}
+
+
+
+function root_menu_entity_info_alter(&$entity_info) {
+  $entity_info['fieldable_panels_pane']['bundles']['root_menu_list_section'] = array(
+    'label' => t('Root List Menu Section'),
+    'pane category' => t('Root Menu'),
+    'pane top level' => FALSE, // set to true to make this show as a top level icon
+    'admin' => array(
+      'path' => 'admin/structure/fieldable-panels-panes/manage/%fieldable_panels_panes_type',
+      'bundle argument' => 4,
+      // Note that this has all _ replaced with - from the bundle name.
+      'real path' => 'admin/structure/fieldable-panels-panes/manage/root_menu_list_section',
+      'access arguments' => array('administer fieldable panels panes'),
+    ),
+  );
+  $entity_info['fieldable_panels_pane']['bundles']['root_menu_featured_section'] = array(
+    'label' => t('Root Featured Menu Section'),
+    'pane category' => t('Root Menu'),
+    'pane top level' => FALSE, // set to true to make this show as a top level icon
+    'admin' => array(
+      'path' => 'admin/structure/fieldable-panels-panes/manage/%fieldable_panels_panes_type',
+      'bundle argument' => 4,
+      // Note that this has all _ replaced with - from the bundle name.
+      'real path' => 'admin/structure/fieldable-panels-panes/manage/root_menu_featured_section',
+      'access arguments' => array('administer fieldable panels panes'),
+    ),
+  );
+}
+
+/**
+ * Template for oEmbed theme.
+ */
+function root_menu_preprocess_oembed(&$vars, $hook) {
+  dpm($vars);
+  print 'cats';
+  $embed = $vars['embed'];
+  if ($embed) {
+
+    $vars['original_url'] = $embed->original_url;
+
+    $vars['classes_array'][] = 'oembed-'. $embed->type;
+    $vars['title_attributes_array']['class'] = 'oembed-title';
+    $vars['content_attributes_array']['class'] = 'oembed-content';
+
+    // oEmbed links render using core link theme unless other preprocess
+    // functions suggest other hooks.
+    if ($embed->type == 'link') {
+      $vars['title_attributes_array']['class'] .= ' oembed-link';
+
+      $vars['theme_hook_suggestions'][] = 'link';
+      $vars['path'] = $embed->original_url;
+      $vars['text'] = $embed->title;
+      $vars['options'] = array(
+        'absolute' => TRUE,
+        'attributes' => $vars['title_attributes_array'],
+        'html' => TRUE,
+      );
+    }
+  }
+}

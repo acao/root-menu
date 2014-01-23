@@ -1,0 +1,5 @@
+name = Root Cafe Menu
+description = Helpers and such for the Root Menu
+core = 7.x
+
+files[] = includes/root_menu_item.inline_entity_form.inc
